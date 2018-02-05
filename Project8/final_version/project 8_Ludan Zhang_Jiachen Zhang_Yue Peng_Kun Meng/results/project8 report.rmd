@@ -1,0 +1,405 @@
+---
+title: "Report for Project 8: Movie Secrets"
+author: "Ludan Zhang, Jiachen Zhang, Yue Peng, Kun Meng"
+date: "November 29, 2016"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r,echo = FALSE}
+setwd("/Users/ludanzhang/Documents/brown/statistical computing I/project 8_Ludan Zhang_Jiachen Zhang_Yue Peng_Kun Meng/results")
+load("movie.rda")
+```
+
+
+<br></br>
+<br></br>
+<br></br>
+
+##Part1. QUESTIONS AND GRAPHS
+
+###I.Questions related to genres.
+
+#####a)What is the most popular genre among all?
+
+    
+<div id="bg">
+  <img src="weight of genres.png" alt="" width= 800 align="middle">
+</div> 
+We are interested in finding which kinds of movie was made and put on screen most frequently. We draw a pie chart to demonstrate our results. This plot showed the weight of each genre which gives us quantitative result. We could spot that the heaviest weights go to drama and comedy with 17.88% and 13.08% respectively.
+
+
+<br></br>
+<br></br>
+
+<div id="bg">
+  <img src="Genres with Highest Gross and Profit.png" alt="" width= 800 align="middle">
+</div> 
+
+We are trying to find which genre gain most box office on average based on all the movie in our dataset. We would also like to find which is the most profitable genre. To compare between different genres, we arrange them in a bar chart.  The bar chart on the left indicate the arrange of different genres based on gross while the bar chart on the right represents ranking of profitability.
+
+As can be seen from the above charts, animation movies gain most gross with a figure reaches 0.26 billion dollars on average following by adventure movie, family movie and fantasy movie. It can also be observed from the charts that the top 7 genres which gain most gross on average are also the genres which on the top list regards to profitability.
+
+We have also showed the standard deviation of each genre in both charts. After comparing between different genres, it can be spotted that average profits for genres on the middle part, including horror, romance and drama, have larger standard deviation than genres on the top and at the bottom. What's more, the comparison between two charts reflects that standard deviations for profit are larger than standard deviation for gross regards to majority genres.
+
+<br></br>
+<br></br>
+
+
+#####b)Dose the preference of genres changed over years?
+<div id="bg">
+  <img src="heat map of genre.png" alt="" width= 800 align="middle">
+</div> 
+
+We would like to find out whether a preference change presents in the population which the data was collected. To reflect the change in preference, we draw a heatmap to illustrate the change over the past 15 years regards to each genre. Darker color reflects larger gross over certain year. The heatmap can indicate two things about the gross of each genre. First, it reflects the number of movies made and put on screen at certain year to some extent. Large number of movies will gain large cumulative gross. Second, it indicates the total gross each genre gained during a certain year.
+
+After examining the heatmap, we can notice that **there is an upward trend in gross for adventure, action, thriller and scientific movies. However, there is no obvious trend in other genres**. 
+
+<br></br>
+<br></br>
+
+
+###II.Questions related to money.
+
+#####a)What movies gain the largest gross? 
+
+#####b)What movies gain the largest profit?
+
+#####c)What movies suffer from biggest losses?
+
+<div id="bg">
+  <img src="top movies.png" alt="" width= 1000 align="middle">
+</div> 
+We intend to find top 20 movies with gross, budget, profit and losses. We draw four bar charts to show our results. It can be observed from the bar charts that Avatar, Titanic and Jurassic World are the top 3 movies which gain large gross and profit. In addition, we could observe that Avatar gain huge profit even though it has largest budget. We could see that some movies suffer big losses because they have large budget such as Ong-bak 2. What's more, the charts show that movies with significant budget do not consist with movies with high profit and high gross. Thus, high budget may not lead to high profit. 
+<br></br>
+<br></br>
+
+
+###III.Questions about directors and actors.
+
+#####a)Who is the most valuable director?
+
+#####b)Who is the most valuable actor?
+
+<div id="bg">
+  <img src="Most Valuable Directors and Actors.png" alt="" width= 1000 align="middle">
+</div> 
+We intend to find who is the most valuable director and who is the most valuable actor. To measure the word, valuable, in quantitative scale, we use to variables-IMDB score and total profit. We selected directors and actors with IMDB score higher than 6.0 and put the score in x axis and total profit in y axis. The two plots showed us very intriguing results. We observed that there are a few directors and actors who have every high IMDB scores, but gained low profit. They are indicated by blue dots. Nevertheless, there are a considerable number of directors and actors who have both high score and high profit. We labeled them in red dots. We could spot some famous names among directors such as James Cameron, Christopher Nolan and Steven Spielberg.
+
+We could also observe popular actors and actresses in the plot such as Scarlett Johansson, Leonardo DiCaprio and Brad Pitt. Thus, using IMDB score and total profit could give us an intuitive result about the profitability of directors and actors. Although further analysis need to be conducted to find more detailed and reliable results, these two plots could give us a preliminary result about the most valuable director and actor.
+
+<br></br>
+<br></br>
+
+###IV.Question related to plot.
+    
+#####a)What is the most frequent plot key words?
+
+<div id="bg">
+  <img src="keyplot wordcloud.png" alt="" width= 800 align="middle">
+</div> 
+
+Our dataset contains a variable which give us plot key words for each movie. We are interested in finding the most frequent words appeared in this variable. By finding these words, we could get a general idea about the plots and stories frequency.  As can be seen in the picture, a significant number of movies talk about love, death, friend and murder. These are the words first pops into our eyes. It can also be observed that some of the movies are set in plot related to New York City, police and friendship.
+
+<br></br>
+<br></br>
+<br></br>
+<br></br>
+
+
+##PART2. TABLES
+
+<br></br>
+
+###I.Table that summarizes the whole data
+```{r,echo = FALSE}
+knitr::kable(summary(movie_data))
+```
+
+<br></br>
+<br></br>
+<br></br>
+<br></br>
+
+###II.Table that summarizes the genre data
+```{r,echo = FALSE}
+load("genre_table.rda")
+knitr::kable(genre_table) 
+```
+
+<br></br>
+<br></br>
+<br></br>
+<br></br>
+<br></br>
+<br></br>
+
+##PART3. ANALYSIS
+
+###I. Number of movies VS. years
+We first draw a plot to explore the relationship.
+
+<div id="bg">
+  <img src="number of movie every year.png" alt="" width= 600 align="middle">
+</div> 
+
+We find that there may be linear relationship between *log(year)* and *number of movies*, Thus we run regression analysis
+
+```{r,echo = FALSE,include=FALSE}
+library(dplyr)
+```
+
+```{r,echo = FALSE}
+
+dat <- movie_data
+
+y <- as.matrix(table(dat$title_year))
+x <-1:length(y)
+z <- data.frame(x,y) 
+knitr::kable(summary(lm(log(y)~x,z))[[4]])
+
+```
+
+#####We observe strongly significant and R-squared = 92.6%
+
+<br></br>
+<br></br>
+<br></br>
+
+
+###II.Analyse the relation between year and number of critic for reviews.
+```{r,echo=FALSE,include=FALSE}
+#library
+library(dplyr)
+library(ggplot2)
+library(gridExtra)
+library(knitr)
+data<-movie_data
+```
+
+First of all, pick all the numeric variables and remove all the rows containing missing values.
+```{r,echo=FALSE}
+nums<-sapply(data, is.numeric)
+data=data[nums]
+data[data==0]<-NA
+data=data[,c(-9,-15)]
+data=na.omit(data)
+```
+
+We would like to know the relation between *year* and *number of critic for reviews*. From the data, we know that the sample sizes for the period before 1980 are to small. There are too much noice in the data for the period before 1981. We only consider the data for the period after 1981. Besides, we delete some of sample points which are too extreme.
+
+```{r,echo=FALSE}
+data_clean<-data%>%filter(duration<=200&director_facebook_likes<=20000&actor_3_facebook_likes<=2500&actor_1_facebook_likes<=50000&gross<=3e+08&cast_total_facebook_likes<=80000&num_user_for_reviews<=1500&budget<=2.0e+08&title_year>1980&actor_2_facebook_likes<=5000)
+```
+
+We calculate the evolution of the **mean of num_critic_for_reviews** with time.
+
+```{r,echo=FALSE}
+
+data_graph1<-data_clean%>%filter(title_year>1985)%>%select(title_year,num_critic_for_reviews)%>%group_by(title_year)%>%summarise(average_critic=mean(num_critic_for_reviews))
+
+ggplot(data_graph1,aes(x=title_year,y=average_critic))+geom_line(color="plum3",size=1.5)+scale_x_continuous(breaks=seq(1986,2016,2))+xlab("Year")+ylab("Average Critic for Reviews")+ggtitle("Plot for Average Critic of Reviews Change over Year")+theme(plot.title=element_text(hjust=0.5,size=rel(1.5)))
+```
+
+From 2014, the decline of of film industry make **num_critic_for_reviews** decreases. This phenomenon is not natural. We only consider the evolution between 1990 and 2013. This evolution could be fitted by a quadratic function:
+
+$$f(x)=0.85(x-1995)^2+52$$
+
+<br></br>
+<br></br>
+
+```{r,echo=FALSE}
+data_graph2<-data_clean%>%filter(title_year>1989&title_year<=2013)%>%select(title_year,num_critic_for_reviews)%>%group_by(title_year)%>%summarise(average_critic=mean(num_critic_for_reviews))
+
+ggplot(data_graph2,aes(x=title_year,y=average_critic))+geom_line(color="plum3",size=1.5)+geom_smooth(method=loess,color = "skyblue3",se=FALSE,size=1.5)+scale_x_continuous(breaks=seq(1990,2013,2))+xlab("Year")+ylab("Average Critic for Reviews")+ggtitle("Plot for Average Critic of Reviews Change over Year")+theme(plot.title=element_text(hjust=0.5,size=rel(1.5)))
+
+```
+
+From the above graph, we could see that **there is a decresing trend before 1994 and an increasing trend after 1994**. We use data after 1994 to explore the line relation between critics of reviews and title year to see whether our quadratic function reflect the true relation.
+
+```{r,echo=FALSE}
+lm_data1<-data_graph2%>%filter(title_year>1994)
+log_critic<-unlist(log(lm_data1[,2]))
+year_critic<-unlist(lm_data1[,1])
+knitr::kable(summary(lm(log_critic~year_critic))[[4]])
+```
+
+During the period 1995-2013, log of **num_critic_for_reviews** increased at a linear speed at the time (year) evolved. The relationship could be expressed as:
+
+$$y=-194.71693+0.09958x$$
+
+<br></br>
+<br></br>
+<br></br>
+
+###III.Analyse the evolution of movie_facebook_likes with time.
+
+Draw the graph showing the evolution of **movie_facebook_likes** during the period 1986-2016.
+```{r,echo=FALSE}
+data_graph3<-data_clean%>%filter(title_year>1985)%>%select(title_year,movie_facebook_likes)%>%group_by(title_year)%>%summarise(average_like=mean(movie_facebook_likes))
+```
+
+From 2014, the decline of of film industry make **movie_facebook_likes** decline. This phenomenon is not natural. We only consider the evolution between 1993 and 2013. This evolution could be fitted by a quadratic function:
+
+$$g(x)=200(x-2000)^2+1600$$
+
+```{r,echo=FALSE}
+ggplot(data_graph3,aes(x=title_year,y=average_like))+geom_line(color="gray50",size=1.5)+geom_smooth(method=loess,color = "gold",se=FALSE,size=1.5)+scale_x_continuous(breaks=seq(1986,2016,2))+xlab("Year")+ylab("Average Facebook Likes")+ggtitle("Plot for Average Facebook Likes Change over Year")+theme(plot.title=element_text(hjust=0.5,size=rel(1.5)))
+```
+
+From the above graph, we could see that **there is a decresing trend before 2000 and an increasing trend after 2000**. We use data after 2000 to explore the line relation between critics of reviews and title year to see whether our quadratic function reflect the true relation.
+```{r,echo=FALSE}
+lm_data2<-data_graph3%>%filter(title_year>=2000)
+log_fblike<-unlist(log(lm_data2[,2]))
+year_fblike<-unlist(lm_data2[,1])
+knitr::kable(summary(lm(log_fblike~year_fblike))[[4]])
+```
+
+During the period 1995-2013, **log of movie_facebook_likes** increased at a lnear speed at the time (year) evolved. The relationship could be expressed as:
+
+$$y=-428.7474+0.218x$$
+
+<br></br>
+<br></br>
+<br></br>
+
+
+
+###IV.Distance analysis for classification
+Finally, we tried to do classification based on the data using distance analysis.
+We want to classify the movie into groups with imdb score higher than 8.0 and less than 8.0.
+
+The first step is to find out significant variable related to imdb score used for the analysis. Thus, we run regression analysis first to find out the significant variables.
+
+```{r,echo = FALSE}
+x <- dat %>%
+  select(aspect_ratio, cast_total_facebook_likes,facenumber_in_poster,
+         num_critic_for_reviews, duration, movie_facebook_likes, 
+         director_facebook_likes, num_voted_users, actor_1_facebook_likes, 
+         actor_2_facebook_likes, actor_3_facebook_likes, budget, gross, imdb_score)
+x <- na.omit(x)
+var_name <- c("aspect_ratio", "cast_total_facebook_likes", "facenumber_in_poster",
+              "num_critic_for_reviews", "duration", "movie_facebook_likes",
+              "director_facebook_likes", "num_voted_users", "actor_1_facebook_likes", 
+              "actor_2_facebook_likes", "actor_3_facebook_likes", "budget", "gross","imdb_score")
+pval <- rep(0, (length(var_name)-1))
+
+for (i in 1:(length(var_name)-1)){
+  pval[i] <- summary(lm(paste0("imdb_score~", var_name[i]), data = x))$coefficients[8]
+}
+
+sig_var <- var_name[which(pval < 0.001)]  # significant variable
+
+sum_lm <- list(0,0,0,0,0,0,0,0,0,0,0,0,0)
+for (i in 1:(length(var_name)-1)){
+  sum_lm[[i]] <- summary(lm(paste0("imdb_score~", var_name[i]), data = x))$coefficients
+}
+
+
+  knitr::kable(sum_lm[[1]])
+  knitr::kable(sum_lm[[2]])
+  knitr::kable(sum_lm[[3]])
+  knitr::kable(sum_lm[[4]])
+  knitr::kable(sum_lm[[5]])
+  knitr::kable(sum_lm[[6]])
+  knitr::kable(sum_lm[[7]])
+  knitr::kable(sum_lm[[8]])
+  knitr::kable(sum_lm[[9]])
+  knitr::kable(sum_lm[[10]])
+  knitr::kable(sum_lm[[11]])
+  knitr::kable(sum_lm[[12]])
+  knitr::kable(sum_lm[[13]])
+
+```
+
+We define a **significant variable when the p-value of regression is smaller than 0.001**.
+
+The second step is to run distance analysis using significant variables. 
+We use two mehods to analyze the data. One is to use Euclidean Distance twice as inputs, the other is to use Euclidean distance and Mahalanobis distance as inputs. 
+We define training set as half of movies in both groups and the other half are used as testing sets. The results are like following.
+
+```{r, echo = FALSE}
+# take the significant variables to use them in the following analysis
+x <- x %>%
+  arrange(imdb_score)
+X <- subset(x, select = sig_var)
+
+# Classification by distance analysis
+# Both using Euclidean Distance
+distance_analysis1 <- function(training1, training2, test = NULL){
+  
+  dist2 <- function(test){
+    mu2 <- colMeans(scale(training2))
+    sqrt(rowSums((scale(test)-mu2)^2))
+  }
+  
+  dist1 <- function(test){
+    mu1 <- colMeans(scale(training1))
+    sqrt(rowSums((scale(test)-mu1)^2))
+  }
+  
+  if (is.null(test) == TRUE) test <- rbind(training1, training2) 
+  
+  nx <- nrow(test)
+  belong <- matrix(rep(0, nx), nrow = 1, byrow = T)
+  mu1 <- colMeans(training1)
+  S1 <- var(training1)
+  w <- dist2(test) - dist1(test)
+  for (i in 1:nx){
+    if (w[i] > 0){
+      belong[i] <- 1 # good movie
+    }else{belong[i] <- 2}
+  }
+  return(belong)
+}
+
+# One using Euclidean distance, the other using Mahalanobis distance
+distance_analysis <- function(training1, training2, test = NULL){
+  
+  dist2 <- function(test){
+    mu2 <- colMeans(scale(training2))
+    sqrt(rowSums((scale(test)-mu2)^2))
+  }
+  
+  if (is.null(test) == TRUE) test <- rbind(training1, training2) 
+  
+  nx <- nrow(test)
+  belong <- matrix(rep(0, nx), nrow = 1, byrow = T)
+  mu1 <- colMeans(training1)
+  S1 <- var(training1)
+  w <- dist2(test) - mahalanobis(test, mu1, S1)
+  for (i in 1:nx){
+    if (w[i] > 0){
+      belong[i] <- 1 # good movie
+    }else{belong[i] <- 2}
+  }
+  return(belong)
+}
+
+
+
+
+# pull out the trainning set
+# Let half of movies with imdb_score less than 8.0 as trainning set
+Y <- as.matrix(X[1:median(which(x$imdb_score<8.0)), ]) 
+# Let the movies with imdb_score larger than 8.0 as another trainning set
+Z <- as.matrix(X[(max(which(x$imdb_score<8.0))+1):(dim(X)[1]), ])  
+# Let the rest of movies with imdb_score less than 8.0 as testing set
+test <- as.matrix(X[(median(which(x$imdb_score<8.0))+1):max(which(x$imdb_score<8.0)), ])
+
+# classification by distance analysis
+belong <- distance_analysis(Y, Z, test)
+belong1 <- distance_analysis1(Y, Z, test)
+# the probability of distinguishing not so good moive successfully by each distance analysis 
+paste0("When using both euclidean distance, the successful classification probability is ",
+       round(sum(belong==2)/nrow(test), digits = 4))
+paste0("When using euclidean distance and mahalanobis distance, the successful classification probability is ",
+      round(sum(belong1==2)/nrow(test), digits = 4))
+```
+
+**The resuts show that our method has a high prediction accuracy**.

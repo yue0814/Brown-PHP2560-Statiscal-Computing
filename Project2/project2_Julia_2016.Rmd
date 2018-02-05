@@ -1,0 +1,219 @@
+---
+title: "Project 2"
+author: "Yue Peng, Yifu Liu, Ludan Zhang, Jiachen Zhang"
+date: "September 21, 2016"
+output:
+  html_document
+---
+
+<style type="text/css">
+.table {
+
+    width: 80%;
+    margin-left:10%; 
+    margin-right:10%;
+}
+</style>
+
+*With this project you will get a chance to practice coding in Julia*
+
+* You can work with Julia on your computer or you can log in to Juliabox and do it. If you use your computer, copy and paste your code and output into commented sections using:
+
+```
+
+```
+
+*Each answer must be supported by the code used to find it. Any explanations given must be in complete sentences. Please include your group members names on your project.*
+
+*You can download the R Markdown file for this project here:* [Project 2]()
+
+---
+
+
+# Practicing Julia Basics
+
+
+## Arrays and Indexing
+
+
+In lab today you will get a chance to explore arrays in Julia.
+
+### Question 1
+
+In Julia run the following command:
+```
+srand(1234)
+x1 = rand(10000)
+```
+
+1. What is the length of `x1`?
+```
+#julia>length(x1)
+```
+```
+#10000
+```
+
+2. What is the 55th element of `x1`?
+```
+#julia>x1[55]
+```
+```
+#0.2924615242315285
+```
+
+3. What is the final element of `x1`?
+```
+#julia>x1[end]
+```
+```
+#0.0055542239982036
+```
+
+4. What is the smallest value of `x1`?
+```
+#julia>minimum(x1)
+```
+```
+#1.0125579466002677e-6
+```
+
+5. How many values are greater than 0.1 but less than 0.57?
+```
+#julia>sum(0.1.<x1.<0.57)
+```
+```
+#4784
+```
+
+6. What is the 4000th smallest value of `x1`?
+```
+#julia> sort(x1)[4000]
+```
+```
+#0.4065088736851672
+```
+
+### Question 2
+
+In Julia run the following command:
+```
+srand(1234)
+x2 = rand(0:1,10000)
+```
+
+1. How many times does 1 appear in `x2`?
+```
+#julia> sum(x2.==1)
+```
+```
+#4969
+```
+
+2. What is the position in the array of the first occurrence of 1?
+```
+#julia> findfirst(x2,1)
+```
+```
+#2
+```
+
+3. What is the position in the array of the last occurrence of 1?
+```
+#julia> findlast(x2,1)
+```
+```
+#9999
+```
+
+4. What position in the vector is the 2406th occurrence of 1?
+```
+#julia> find(x2.==1)[2406]
+```
+```
+#4837
+```
+
+### Question 3 
+
+In Julia run the following command:
+```
+srand(1234)
+x3= randstring(10000)
+```
+
+1. Create an 1 column array with only one letter in each position name this `x3`. 
+```
+#julia> split(x3,"")
+```
+```
+#10000-element Array{SubString{ASCIIString},1}:
+# "m"
+# "b"
+# ⋮
+# "V"
+# "O"
+```
+
+2. How many times does "A" appear in `x3`?
+```
+#julia> length(matchall(r"A", x3))
+```
+```
+#163
+```
+
+3. How many pairs of letters are there in `x3` (AA, BB)?
+```
+#julia> length(matchall(r"([A-z0-9])\1", x3))+length(matchall(r"([A-z0-9])\1\1", x3))
+#those forms like AAA should be count into 2 pairs of AA, so we should add 1 each
+```
+```
+#178
+```
+
+4. What letter appears the least? The most?
+```
+#upper = collect(Char(i) for i in 65:90)
+#lower = collect(Char(i) for i in 97:122)
+#len_upp = [1]
+#len_low = [1]
+#for i in 1:26
+#       l1 = find(x3) do l
+#       l == upper[i]
+#       end
+#       push!(len_upp, length(l1))
+#       end
+#for i in 1:26
+#       l2 = find(x3) do l
+#       l == lower[i]
+#       end
+#       push!(len_low, length(l2))
+#       end
+#shift!(len_upp)
+#shift!(len_low)
+```
+```
+#if findmax(len_upp)[1] > findmax(len_low)[1]
+#print(upper[findmax(len_upp)[2]], " appears the most")
+#else
+#print(lower[findmax(len_low)[2]], " appears the most")
+#end
+```
+```
+w appears the most
+```
+```
+#if findmin(len_upp)[1] < findmin(len_low)[1]
+#print(upper[findmin(len_upp)[2]], " appears the least")
+#else
+#print(lower[findmin(len_low)[2]], " appears the least")
+#end
+```
+```
+U appears the least
+```
+
+
+
+

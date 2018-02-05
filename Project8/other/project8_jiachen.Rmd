@@ -1,0 +1,80 @@
+---
+title: "project8_modified_by_jiachen"
+author: "jiachen"
+date: "November 26, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r}
+#library
+library(dplyr)
+library(ggplot2)
+library(gridExtra)
+data<-read.csv("c:/Study/PHP2560/movie_metadata.csv")
+```
+
+
+```{r}
+#First of all, pick all the numeric variables and remove all the rows containing missing values.
+nums<-sapply(data, is.numeric)
+data=data[nums]
+data[data==0]<-NA
+data=data[,c(-9,-15)]
+data=na.omit(data)
+```
+
+
+```{r}
+#We would like to know the relation between year and number of critic for reviews. From the data, we know that the sample sizes for the period before 1980 are to small. There are too much noice in the data for the period before 1981. We only consider the data for the period after 1981. Besides, we delete some of sample points which are too extreme.
+
+#Deleting the data for the period before 1981 and the extreme sample points.
+
+data_clean<-data%>%filter(duration<=200&director_facebook_likes<=20000&actor_3_facebook_likes<=2500&actor_1_facebook_likes<=50000&gross<=3e+08&cast_total_facebook_likes<=80000&num_user_for_reviews<=1500&budget<=2.0e+08&title_year>1980&actor_2_facebook_likes<=5000)
+```
+
+
+```{r}
+#From the graphs, we know that num_critic_for_reviews and movie_facebook_likes have comparatively strong (nonlinear) correlation with time. We calculate the evolution of the mean of num_critic_for_reviews with time.
+data_graph1<-data_clean%>%filter(title_year>1985)%>%select(title_year,num_critic_for_reviews)%>%group_by(title_year)%>%summarise(average_critic=mean(num_critic_for_reviews))
+critic_year1<-ggplot(data_graph1,aes(x=title_year,y=average_critic))+geom_line(color="plum3",size=1.5)+scale_x_continuous(breaks=seq(1986,2016,1))+xlab("Year")+ylab("Average Critic for Reviews")+ggtitle("Plot for Average Critic of Reviews Change over Year")+theme(plot.title=element_text(hjust=0.5,size=rel(1.5)))
+#From 2014, the decline of of film industry make num_critic_for_reviews decreases. This phenomenon is not natural. We only consider the evolution between 1990 and 2013. This evolution could be fitted by a quadratic function.
+
+data_graph2<-data_clean%>%filter(title_year>1989&title_year<=2013)%>%select(title_year,num_critic_for_reviews)%>%group_by(title_year)%>%summarise(average_critic=mean(num_critic_for_reviews))
+critic_year2<-ggplot(data_graph2,aes(x=title_year,y=average_critic))+geom_line(color="plum3",size=1.5)+geom_smooth(method=loess,color = "skyblue3",se=FALSE,size=1.5)+scale_x_continuous(breaks=seq(1990,2013,1))+xlab("Year")+ylab("Average Critic for Reviews")+ggtitle("Plot for Average Critic of Reviews Change over Year")+theme(plot.title=element_text(hjust=0.5,size=rel(1.5)))
+
+```
+
+Consider the evolution of movie_facebook_likes with time.
+
+```{r}
+#Draw the graph showing the evolution of movie_facebook_likes during the period 1986-2016.
+data_graph3<-data_clean%>%filter(title_year>1985)%>%select(title_year,movie_facebook_likes)%>%group_by(title_year)%>%summarise(average_like=mean(movie_facebook_likes))
+
+#From 2014, the decline of of film industry make movie_facebook_likes. This phenomenon is not natural. We only consider the evolution between 1993 and 2013. This evolution could be fitted by a quadratic function.
+fblikes_year<-ggplot(data_graph3,aes(x=title_year,y=average_like))+geom_line(color="gray50",size=1.5)+geom_smooth(method=loess,color = "gold",se=FALSE,size=1.5)+scale_x_continuous(breaks=seq(1986,2016,1))+xlab("Year")+ylab("Average Facebook Likes")+ggtitle("Plot for Average Facebook Likes Change over Year")+theme(plot.title=element_text(hjust=0.5,size=rel(1.5)))
+
+grid.arrange(critic_year2,fblikes_year,ncol = 2)
+```

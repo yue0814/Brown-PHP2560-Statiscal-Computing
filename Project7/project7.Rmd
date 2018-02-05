@@ -1,0 +1,286 @@
+---
+title: "Project 7"
+author: "Yue Peng, Ludan Zhang, Jiachen Zhang, Kun Meng"
+date: "Due October 26, 2016 at 5:00pm"
+output:
+  html_document
+
+
+---
+
+<style type="text/css">
+.table {
+
+    width: 80%;
+    margin-left:10%; 
+    margin-right:10%;
+}
+</style>
+```{r,setup, echo=FALSE, cache=TRUE}
+## numbers >= 10^5 will be denoted in scientific notation,
+## and rounded to 2 digits
+options(scipen = 3, digits = 3)
+```
+
+
+
+
+#Project Goals:
+
+The goal of this project is to get better  aquainted with Dplyr and working with data. 
+
+[Project 7 Markdown]()
+
+# New York City Flights 13
+
+- `flights` [336,776 x 16]. Every flight leaving NYC in 2013.
+- `weather` [ 8719 x 14]. Hourly Weather Data.
+- `planes` [3322 x 9]. Plane data.
+- `airports` [1397 x 7]. Airport data. 
+
+
+```{R}
+library(nycflights13)
+library(dplyr)
+flights
+```
+
+
+# Basic Dyplyr
+
+The deplyr package uses verbs to perform data manipulation.
+- `filter()` and `slice()`
+- `arrange()`
+- `select()` and `rename()`
+- `distinct()`
+- `mutate()` and `transmute()`
+- `sample_n()` and `sample_frac()`
+
+## Filtering Rows
+
+1. Filter all flights on your birthday. 
+```{r}
+bir_month <- 8
+bir_day <- 14
+flights %>%
+filter(month == bir_month, day == bir_day)
+```
+
+2. Filter all flights in rows 567 - 589
+```{r}
+flights %>%
+  slice(567:589)
+```
+
+## Arranging Rows
+
+1. Use  `arrange()` to order the data by `year, month and day`
+```{r}
+flights %>%
+  arrange(year, month, day)
+```
+2. Use `desc()` to arrange flights by arrival delay. 
+```{r}
+flights %>%
+  arrange(desc(arr_delay))
+```
+
+## Select
+
+1. Select columns containing date information.
+```{r}
+flights %>%
+  select(year, month, day, time_hour)
+```
+
+2. Select columns including only plane information.
+```{r}
+flights %>%
+  select(carrier, flight, tailnum)
+```
+
+3. Rename `tailnum` to `tail_num`
+```{r}
+flights %>%
+  select(tail_num = tailnum)
+#rename(flights, tail_num = tailnum)
+```
+
+## Mutating Rows
+
+1. Create a variable called `gain` which describes the difference between arrival delap and departure delay.
+```{r}
+flights %>%
+  mutate(gain = arr_delay - dep_delay)
+```
+
+2. Create a variable called speed which is distance over time in hours. 
+```{r}
+flights %>%
+  mutate(speed = distance / air_time * 60)
+```
+
+## Summarise
+
+1. Summarise the average delay for all flights.
+```{r}
+flights %>%
+  summarise(delay = mean(dep_delay, na.rm = TRUE))
+```
+
+# Overall Questions 
+
+1. Split the complete dataset into individual planes and then summarise each plane by counting the number of flights (count = n()) and computing the average distance and arrival delay .  Then plot this:
+```{r}
+delay <- flights %>%
+  group_by(tailnum) %>%
+  summarise(count = n(), dist = mean(distance, na.rm = TRUE), delay = mean(arr_delay, na.rm = TRUE))
+
+```
+
+```{r}
+library(ggplot2)
+ggplot(delay, aes(dist, delay)) +
+  geom_point(aes(size = count), alpha = 1/2) +
+  geom_smooth() +
+  scale_size_area()
+```
+
+
+2.  Find the number of planes and the number of flights that go to each possible destination. 
+```{r}
+flights %>%
+  group_by(dest) %>%
+  summarise(planes = n_distinct(tailnum), flights = n())
+```
+
+
+### More Difficult
+
+In the videos we learned about piping our commands. The goal of piping is to help use with the flow of our analysis. The steps we take are:
+- Think about it. 
+- Describe it. 
+- Do it. 
+
+
+### Consider the function below:
+
+
+
+```{r}
+bas_r <- filter(
+      summarise(
+        select(
+          group_by(flights, year, month, day),
+          arr_delay, dep_delay
+        ),
+        arr = mean(arr_delay, na.rm = TRUE),
+        dep = mean(dep_delay, na.rm = TRUE)
+      ),
+      arr > 30 | dep > 30
+    )
+
+```
+
+
+
+  a. What are some problems with this function? 
+```{r}
+# If you want to understand this chunk of codes, you must read from inside to outside. It is not readable.
+```
+  b. How easy is it to follow the logic of this? 
+```{r}
+# Not easy to read in this way. We can rewrite it step by step, write down every step by natural thinking order.
+```
+  c. Rewrite this using piping to make it more understandable. 
+```{r}
+pip_r <- flights %>%
+  group_by(year, month, day) %>%
+  select(arr_delay, dep_delay) %>%
+  summarise(arr = mean(arr_delay, na.rm = TRUE), dep = mean(dep_delay, na.rm = TRUE)) %>%
+  filter(arr >30 | dep >30)
+```
+  d. Use your function testing skills to verify they return the same results. 
+```{r}
+all_equal(bas_r, pip_r)
+```
+  e.  How would you write the above in terms of SQL?
+```{r}
+library(RMySQL)
+library(DBI)
+con <-dbConnect(MySQL(),
+                user = "py0814",
+                password = "seven=2+5",
+                host = "yuedb.ccxrmxtuzhfi.us-east-1.rds.amazonaws.com",
+                dbname = "Mydata")
+
+query <- "SELECT year, month, day, AVG(arr_delay) AS arr, AVG(dep_delay) AS dep
+          FROM flights 
+          GROUP BY year, month, day
+          HAVING arr > 30 OR dep >30;"
+
+dbGetQuery(con, query)
+```
+  
+### Consider the function below
+
+
+
+```{r}
+    hourly_delay <- filter(
+              summarise(
+                  group_by(
+                      filter(
+                        flights, 
+                        !is.na(dep_delay)
+                        ),
+                        month, day, hour
+                        ),
+                        delay=mean(dep_delay),
+                        n=n()
+                        ),
+                        n>10
+                        )
+                                          
+```
+
+
+  a. What are some problems with this function? 
+```{r}
+# If you want to understand this chunk of codes, you must read from inside to outside. It is not readable from our natural logic.
+```
+  b. How easy is it to follow the logic of this? 
+```{r}
+# Not easy to read in this way. We can rewrite it step by step, write down every step by natural thinking order.
+```
+  c. Rewrite this using piping to make it more understandable. 
+```{r}
+hourly_delay2 <- flights %>%
+  filter(!is.na(dep_delay)) %>%
+  group_by(month, day, hour) %>%
+  summarise(delay = mean(dep_delay), n = n()) %>%
+  filter(n > 10)
+```
+
+  d. Use your function testing skills to verify they return the same results. 
+```{r}
+all_equal(hourly_delay, hourly_delay2)
+```
+  e.  How would you write the above in terms of SQL?
+```{r}
+
+
+query2 <- "SELECT month, day, hour, AVG(dep_delay) AS delay, COUNT(*) AS n
+           FROM flights 
+           WHERE dep_delay IS NOT NULL
+           GROUP BY month, day, hour
+           HAVING n > 10;"
+
+dbGetQuery(con, query2)
+```
+
+
+## Consider how to join information from the other datasets in the package with the current information. Is there a way to tell if weather affected the departure  time? Ask yourself other questions about this data and then answer them below. 
+```
+We can join the flights dataset with a weather dataset which records the weather everyday in year 2013. That is to say, we can have a weather dataset containing date(primary key) and weather columns and use inner_join to join the flights dataset with the weather dataset to a new dataset called flights_weather. Then we can summarise the mean departure time of the flights for each type of weather by using code like: summarise(group_by(flights_weather,weather),mean(dep_time)). The summary would tell us if the weather affected the departure time.
+```

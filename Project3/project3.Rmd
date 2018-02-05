@@ -1,0 +1,531 @@
+---
+title: "Project 3; Control Structures"
+author: "Yue Peng, Kun Meng, Ludan Zhang, Jiachen Zhang"
+date: "September 28, 2016"
+output:
+  html_document
+---
+
+<style type="text/css">
+.table {
+
+    width: 80%;
+    margin-left:10%; 
+    margin-right:10%;
+}
+</style>
+
+
+
+
+
+
+#Project Goals:
+
+
+Our goal with this project is to start to practice loops. We will begin with some made up exercises and them move into real data cleaning. 
+
+
+
+# Part I:
+
+This part will contain some basic loops and control structures. You will have 1 hour to do this part and then we will present results and ideas of your code to the class. 
+
+### Question 1: Repeat for R and Julia.
+
+Using a loop, print the integers from 1 to 50. 
+
+```{r}
+for (i in 1:50){
+  print(i)
+}
+```
+```
+#julia
+#julia> for i in 1:50
+#       println(i)
+#       end
+```
+
+### Question 2: Repeat for R and Julia.
+
+A.  Using a loop, add all the integers between 0 and 1000.
+```{r}
+sum <- 0
+for (i in 1:1000){
+  sum <- sum + i
+}
+```
+
+```
+#julia
+#julia> sum=0
+#julia> for i in 0:1000
+#       sum += i
+#       end
+```
+
+B. Now, add all the EVEN integers between 0 and 1000 (hint: use seq())
+```{r}
+sum <- 0
+for (i in seq(0,1000,2)) {
+  sum <- sum + i
+}
+```
+
+```
+#julia
+#julia> sum=0
+#julia> for i in 0:2:1000
+#       sum += i
+#       end
+```
+
+C. Now, repeat A and B WITHOUT using a loop.
+```{r}
+sum(0:1000)
+sum(seq(0,1000,2))
+```
+
+```
+#julia
+#sum(collect(0:1000)
+#sum(collect(0:2:1000)
+```
+
+### Question 3: R Only
+
+Here is a dataframe of survey data containing 5 questions :
+
+```{r}
+survey <- data.frame(
+                     "participant" = c(1, 2, 3, 4, 5, 6),
+                     "q1" = c(5, 3, 2, 7, 11, 0),
+                     "q2" = c(4, 2, 2, 5, -10, 99),
+                     "q3" = c(-4, -3, 4, 2, 9, 10),
+                     "q4" = c(-30, 5, 2, 23, 4, 2),
+                     "q5" = c(88, 4, -20, 2, 4, 2)
+                     )
+```
+The response to each question should be an integer between 1 and 5. Obviously, we have some bad values in the dataframe. The goal of this problem is to fix them.
+
+A. Using a loop, create a new dataframe called survey.clean where all the invalid values (those that are not integers between 1 and 5) are set to NA.
+```{r}
+clean <- function(x){
+  x[x<1] <- NA
+  x[x>5] <- NA
+  return(x)
+}
+  
+survey.clean <- data.frame(survey)
+for (i in 2: length(survey[[1]])){
+  survey.clean[[i]] <- clean(survey[[i]])
+}
+
+print(survey.clean)
+```
+
+B. Now, again using a loop, add a new column to the dataframe called “invalid.answers” that indicates, for each participant, how many bad answers they gave.
+```{r}
+sur_mat <- as.matrix(survey.clean)
+inv_num <- rep(1,6)
+for (i in 1:6){
+  inv_num[i] <- sum(is.na(sur_mat[i,]))
+}
+
+survey.clean <- data.frame(survey.clean, invalid.answers = inv_num)
+survey.clean
+```
+
+###Question 4: R Only
+
+Standardizing a variable means subtracting the mean, and then dividing by the standard deviation. Let’s use a loop to standardize the numeric columns in the [Western Collaborative Group Study](https://clinicaltrials.gov/ct2/show/NCT00005174). This study began in 1960 with 3154 men ages 39-59, who were employed in one of 11 California based companies. They were followed until 1969 during this time, 257 of these men developed coronary heart disease (CHD). You can read this data in with the code below. You can access this dataset with the following code:
+
+```{r}
+
+suppressMessages(library(foreign))
+
+wcgs <- read.dta("~/R/PHP2560/wcgs2.dta")
+```
+
+The data has the following variables:
+
+
+
+WCGS has the following variables:
+
+-----------------------------------------------------------
+Name    Description
+------- -------------------------------------------
+id      Subject identification number
+
+age     Age in years
+
+height  Height in inches
+
+weight  Weight in lbs.
+
+sbp     Systolic blood pressure in mm 
+
+dbp     Diastolic blood pressure in mm Hg
+
+chol    Fasting serum cholesterol in mm 
+
+behpat  Behavior
+
+  1       A1
+
+  2       A2
+
+  3       B3
+
+  4       B4
+
+ncigs   Cigarettes per day
+
+dibpat  Behavior
+
+1       type A
+
+2       type B
+
+chd69   Coronary heart disease
+
+1       Yes
+
+0       no
+
+typechd Type of CHD
+
+1       myocardial infarction or death
+
+2       silent myocardial infarction
+
+3       angina perctoris
+
+time169 Time of CHD event or end of follow-up
+
+arcus   Arcus senilis
+
+0       absent
+
+1       present
+
+bmi     Body Mass Index
+-----------------------------------------------------------
+
+A. Create a function called standardize.me() that takes a numeric vector as an argument, and returns the standardized version of the vector. 
+```{r}
+standardize.me <- function(x){
+  return(scale(x))
+}
+```
+
+B. Assign all the numeric columns of the original WCGS dataset to a new dataset called WCGS.new.
+```{r}
+WCGS.new <- data.frame(wcgs)
+
+ind <- c()
+for (i in 2:length(names(wcgs))){
+  if (!is.numeric(wcgs[[i]])){
+    ind <- c(ind, i)
+  }
+}
+WCGS.new <- WCGS.new[,-ind]
+
+```
+
+C. Using a loop and your new function, standardize all the variables WCGS.new dataset.
+```{r}
+for (i in 2:length(names(WCGS.new))){
+    WCGS.new[[i]] <- standardize.me(WCGS.new[[i]])
+}
+```
+
+D. What should the mean and standard deviation of all your new standardized variables be? Test your prediction by running a loop
+```{r}
+m <- c()
+std_dev <- c()
+for (i in 2:length(names(WCGS.new))){
+    m <- c(m,mean(WCGS.new[[i]], na.rm = TRUE))
+    std_dev <- c(std_dev, sd(WCGS.new[[i]], na.rm = TRUE))
+}
+m 
+std_dev
+# all mean of new standardized variables is 0, and standard deviation is 1.  
+
+```
+
+### Question 5: R Only
+
+A. Using a loop, calculate the mean weight of the subjects separated by the type of CHD they have.
+```{r}
+wcgs1 <- wcgs
+wcgs1$typchd69 <- factor(wcgs$typchd69)
+a1 <- 0
+for (i in 1:length(levels(wcgs1$typchd69)))
+  { 
+  a1 <- wcgs1$weight[wcgs1$typchd69 == levels(wcgs1$typchd69)[i]]
+    print(mean(a1))
+}
+```
+
+B. Now do the same thing, but now don’t use a loop
+```{r}
+tapply(wcgs1$weight, wcgs1$typchd69, mean)
+```
+
+# Part II. 
+
+
+An important part of working with Data is being able to access data from the internet and clean if for your purposes. This part of the project will be to learn how to use loops, controls and basic functions to clean data. 
+
+
+This data come from the Behavioral Risk Factor Surveillance System (BRFSS). This is a national health-related telephone survey. There are more than 400,000 interviews done every year from all 50 states and the district of Columbia. To learn more about this survey please go to their website: [Behavioral Risk Factor Surveillance System](http://www.cdc.gov/brfss/). 
+
+This will give everyone a chance to explore a very large, messy and real data set. The tools you will gain from this will be the knowledge of how to take a messy dataset, clean it. 
+
+
+* [Codebook](http://www.cdc.gov/brfss/annual_data/2015/pdf/codebook15_llcp.pdf)
+* [Data](https://www.cdc.gov/brfss/annual_data/2015/files/LLCP2015XPT.zip)
+* [Variable Layout](https://wwwdev.cdc.gov/brfss/annual_data/2015/llcp_varlayout_15_onecolumn.html)
+
+
+
+
+### Loading the Data
+
+1. Go to the webpage and download the SAS transport file. 
+2. Load this into R with:
+```
+library(foreign)
+# This is where mine is stored, you will have to change in for yours. 
+brfss.2015 <- read.xport("C:/Users/adam_/Downloads/LLCP2015XPT/LLCP2015.xpt")
+```
+
+
+### Initial Steps
+```{r}
+brfss.2015 <- read.xport("~/R/PHP2560/LLCP2015.xpt")
+```
+
+1. One the data is loaded look at the head of the data. Notice that many covariate have a `X_` in front of them. Remove this. 
+```{r}
+brfss.name <- names(brfss.2015)
+name.X <- paste("X_[A-z0-9]+")
+have.X <- grep(brfss.name, pattern = name.X)
+brfss.name[have.X] = gsub("X_", "", brfss.name[have.X])
+names(brfss.2015) <- brfss.name
+brfss.2015[1,]
+
+```
+
+2. Change all covariates to lowercase
+```{r}
+names(brfss.2015) <- tolower(brfss.name)
+brfss.2015[1,]
+```
+
+### Data Cleaning
+
+There are 330 Variables, it would take each person a long time to clean this all. 
+
+1. Loop through the columns to determine the amount of missing data. 
+```{r}
+amount_miss_col <- vector(length = 330)
+for (i in 1:330) {
+ amount_miss_col[i] <- sum(is.na(brfss.2015[,i]))
+}
+sum(amount_miss_col)
+```
+
+2. If you loop through the rows do you find the same answer?
+```{r}
+sum1 <- 0
+amount_miss_low <- vector(length = length(brfss.2015[[1]]))
+for (i in 1:length(brfss.2015[[1]])) {
+ amount_miss_low[i] <- sum(is.na(brfss.2015[i,]))
+}
+sum(amount_miss_low) == sum(amount_miss_col)
+```
+
+3. Many times people refused to answer or did not know. Find out how these were coded. For now we can consider them `NA`. Change them to `NA`.  
+```{r}
+#exclude some sprcial cases. First, deal with the cases where 7,77,777,7777,77777,777777,9,99,999,9999,99999,999999 equal to don't know or refuse to answer 
+first.to.exclude <- c("QSTLANG","DUALUSE","PA1VIGM_","PAVIG21_","PAVIG11_","PA1MIN_","PAMIN21_","PAMIN11_","ASTHMAGE","ASERUIST","ASDRUIST","ASRCHKUP","PCDMDECN","SCNTWRK1","SCNTLWK1","STRFREQ_","_MINAC21","_MINAC11","PAFREQ2_","PAFREQ1_","FC60_","MAXVO2_","_DRNKWEK","DROCDY3_","HTM4","_AGE80","_AGE65YR","_AGEG5YR")
+for (i in 25:dim(brfss.2015)[2]) {
+        if (!sum(brfss.name[i] == first.to.exclude)) {
+                refuse.donknow.6 <- "^[7]{6}$|^[9]{6}$"
+                have <- data.frame(grepl(brfss.2015[,i],pattern = refuse.donknow.6))
+                refuse.donknow.5 <- "^[7]{5}$|^[9]{5}$"
+                have <- data.frame(have,grepl(brfss.2015[,i],pattern = refuse.donknow.5))
+                refuse.donknow.4 <- "^[7]{4}$|^[9]{4}$"
+                have <- data.frame(have,grepl(brfss.2015[,i],pattern = refuse.donknow.4))
+                refuse.donknow.3 <- "^[7]{3}$|^[9]{3}$"
+                have <- data.frame(have,grepl(brfss.2015[,i],pattern = refuse.donknow.3))
+                refuse.donknow.2 <- "^[7]{2}$|^[9]{2}$"
+                have <- data.frame(have,grepl(brfss.2015[,i],pattern = refuse.donknow.2))
+                refuse.donknow.1 <- "^[7]{1}$|^[9]{1}$"
+                have <- data.frame(have,grepl(brfss.2015[,i],pattern = refuse.donknow.1))
+                have.sum <- colSums(have)
+                for (j in 1:6) {
+                        if (have.sum[j] == 0) {
+                                j = j + 1
+                        } else {
+                                have.which <- have[,j]
+                                break
+                        }
+                }
+                if (sum(have.which)) {
+                brfss.2015[,i][have.which] <- NA
+                }
+        }
+}
+
+# 99000 = Don't know/Not Sure/Refused/Missing
+for (i in c("pafreq2_","pafreq1_","strfreq_")){
+        refuse.donknow<- paste("^99000$")
+        have.which <- grepl(brfss.2015$i,pattern = refuse.donknow)
+        if (sum(have.which)) {
+        brfss.2015$i[have.which] <- NA
+        }
+}
+
+# 99900 = Don't know/Not Sure/Refused
+for (i in c("fc60_","maxvo2_","drnkwek")){
+        refuse.donknow<- paste("^99900$")
+        have.which <- grepl(brfss.2015$i,pattern = refuse.donknow)
+        if (sum(have.which)) {
+        brfss.2015$i[have.which] <- NA
+        }
+}
+
+# 900 = Don't know/Not Sure/Refused/Missing
+        refuse.donknow<- paste("^900$")
+        have.which <- grepl(brfss.2015$drocdy3_,pattern = refuse.donknow)
+        brfss.2015$drocdy3_[have.which] <- NA
+        
+# 98,99 = Don't know/Not Sure/Refused
+for (i in c("asthmage","aseruist","asdruist","asrchkup")){
+        refuse.donknow<- paste("^98$|^99$")
+        have.which <- grepl(brfss.2015$i,pattern = refuse.donknow)
+        if (sum(have.which)) {
+        brfss.2015$i[have.which] <- NA
+        }
+}      
+
+# 97,99 = Don't know/Not Sure/Refused
+for (i in c("scntwrk1","scntlwk1")){
+        refuse.donknow<- paste("^97$|^99$")
+        have.which <- grepl(brfss.2015$i,pattern = refuse.donknow)
+        if (sum(have.which)) {
+        brfss.2015$i[have.which] <- NA
+        }
+}      
+        
+# 14 = Don't know/Not Sure/Refused     
+for (i in c("ageg5yr")){
+        refuse.donknow<- paste("^14$")
+        have.which <- grepl(brfss.2015$i,pattern = refuse.donknow)
+        if (sum(have.which)) {
+        brfss.2015$i[have.which] <- NA
+        }
+}         
+        
+# 3 = Don't know/Not Sure/Refused
+        refuse.donknow<- paste("^3$")
+        have.which <- grepl(brfss.2015$age65yr,pattern = refuse.donknow)
+        if (sum(have.which)) {
+        brfss.2015$age65yr[have.which] <- NA
+        }
+        
+# 7,9 = Don't know/Not Sure/Refused However 12-4328 = multiple answers
+        refuse.donknow<- paste("^7$|^9$")
+        have.which <- grepl(brfss.2015$pcdmdecn,pattern = refuse.donknow)
+        if (sum(have.which)) {
+        brfss.2015$pcdmdecn[have.which] <- NA
+        }
+
+```
+
+4. Redo the loop through columns to determine how much data is missing. 
+```{r}
+amount_miss_col_new <- vector(length = 330)
+for (i in 1:330) {
+ amount_miss_col_new[i] <- sum(is.na(brfss.2015[,i]))
+}
+sum(amount_miss_col_new)
+```
+
+5. Run the random values below to find 10 variables that you will be assigned to clean. 
+```
+my_vars <- a <- ceiling(runif(10, min=25, max=330))
+```
+
+6. Go into the codebook and create value labels for the variables you have been assigned:
+
+```
+# variable v1 is coded 1, 2 or 3
+# we want to attach value labels 1=red, 2=blue, 3=green
+
+mydata$v1 <- factor(mydata$v1,
+levels = c(1,2,3),
+labels = c("red", "blue", "green"))
+```
+```{r}
+my_vars <- c(71, 224, 58, 151, 220, 312, 257, 317, 273, 128)
+v1 <- names(brfss.2015)[my_vars[1]]
+brfss.2015[[v1]] <- factor(brfss.2015[[v1]],
+levels = c(1, 2, NA),
+labels = c("Yes", "No", "Do not know, refused or missing"),
+exclude = NULL)
+table(brfss.2015[[v1]][drop = TRUE])
+
+v2 <- names(brfss.2015)[my_vars[2]]
+brfss.2015[[v2]] <- factor(brfss.2015[[v2]],
+levels = c(1, 2, 3, NA),
+labels = c("English", "Spanish", "Other",  "Missing"),
+exclude = NULL)
+table(brfss.2015[[v2]][drop = TRUE])
+
+v3 <- names(brfss.2015)[my_vars[3]]
+brfss.2015[[v3]] <- factor(brfss.2015[[v3]],
+levels = c(1, 2, 3, 4, 5, 6, NA),
+labels = c("A Residential telephone number", "Two Residential telephone numbers", "Three Residential telephone numbers","Four Residential telephone numbers", "Five Residential telephone numbers", "Six or More Residential telephone numbers",  "Missing"),
+exclude = NULL)
+table(brfss.2015[[v3]][drop = TRUE])
+
+v4 <- names(brfss.2015)[my_vars[4]]
+brfss.2015[[v4]] <- factor(brfss.2015[[v4]],
+levels = c(1, 2, NA),
+labels = c("Yes", "No", "Missing"),
+exclude = NULL)
+table(brfss.2015[[v4]][drop = TRUE])
+
+v5 <- names(brfss.2015)[my_vars[5]]
+brfss.2015[[v5]] <- factor(brfss.2015[[v5]],
+levels = c(1:14, NA),
+labels = c(paste(c(1:14), rep("days", 14)), "Missing"),
+exclude = NULL)
+table(brfss.2015[[v5]][drop = TRUE])
+
+v6 <- names(brfss.2015)[my_vars[6]]
+brfss.2015[[v6]] <- factor(brfss.2015[[v6]], levels = c(0:99999, NA), labels = c(paste(c(0:99999), rep("Minutes of Activity per week", 10000)),"Not asked or Missing"), exclude = NULL)
+table(brfss.2015[[v6]][drop = TRUE])
+
+v7 <- names(brfss.2015)[my_vars[7]]
+brfss.2015[[v7]] <- factor(brfss.2015[[v7]], levels = c(1, 2, 3), labels = c("Age 18 to 64 Notes: 18 <= AGE <= 64","Age 65 or older 152 Notes: 65 <= AGE <= 99","Don’t know/Refused/Missing Notes: 7 <= AGE <= 9"))
+table(brfss.2015[[v7]][drop = TRUE])
+
+v8 <- names(brfss.2015)[my_vars[8]]
+brfss.2015[[v8]] <- factor(brfss.2015[[v8]], levels = c(1, 2, 3, NA), labels = c("150+ minutes (or vigorous equivalent minutes) of physical activity","1-149 minutes (or vigorous equivalent minutes) of physical activity","0 minutes (or vigorous equivalent minutes) of physical activity","Don’t know/Not Sure/Refused/Missing"), exclude = NULL)
+table(brfss.2015[[v8]][drop = TRUE])
+
+v9 <- names(brfss.2015)[my_vars[9]]
+brfss.2015[[v9]] <- factor(brfss.2015[[v9]], levels = c(1, 2, NA), labels = c("No, Notes: ALCDAY5 < 300 and DRNK3GE5 = 0 or ALCDAY5 = 888","Yes, Notes: ALCDAY5 < 300 and DRNK3GE5 = 1","Don’t know/Refused/Missing, Notes: DRNK3GE5 = 7 or 9 or Missing or ALCDAY5 = 777 or 999 or Missing"), exclude = NULL)
+table(brfss.2015[[v9]][drop = TRUE])
+
+v10 <- names(brfss.2015)[my_vars[10]]
+brfss.2015[[v10]] <- factor(brfss.2015[[v10]], levels = c(1, 2, 3, 4, NA), labels = c("Up to 8 hours per week","9 to 19 hours per week","20 to 39 hours per week","40 hours or more","Don’t know/Not sure/Refused/Not asked or Missing"), exclude = NULL)
+table(brfss.2015[[v10]][drop = TRUE])
+```

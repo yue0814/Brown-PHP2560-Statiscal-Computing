@@ -1,0 +1,127 @@
+---
+title: "Project 8: Automated Data Analysis "
+author: "November 2, 2016 - November 16, 2016"
+date: "Due November 16, 2016 at 5:00pm"
+output:
+  html_document
+
+
+---
+
+<style type="text/css">
+.table {
+
+    width: 80%;
+    margin-left:10%; 
+    margin-right:10%;
+}
+</style>
+```{r,setup, echo=FALSE, cache=TRUE}
+## numbers >= 10^5 will be denoted in scientific notation,
+## and rounded to 2 digits
+options(scipen = 3, digits = 3)
+```
+
+
+
+
+#Project Goals:
+
+The goal of this project is to begin to automate your data analysis. Up to this point we have focused on working with data structures, working with data on your computer as well as on a database. What we will do in this project is to attempt to pull all of these things together. Your goal in class today will be to start this project
+
+[Project 8 Markdown]()
+
+
+
+# Outline of Project
+
+## November 2, 2016
+
+1. The Question. 
+    a. Find something you are interested as a group.
+    b. Decide on questions that you would like to answer. 
+    c. Get these questions written out concisely.
+
+2. The Data
+    a. Find a dataset online or find data you can scrape.
+    b. Write a function to download this data. 
+    c. Write a function to store this data into an rda format. 
+    d. Write this data to MonetDBLite. 
+    e. create a file called `get_data.R` that does these steps.
+```{r}
+#source("/Users/PY/GoogleDrive/Fall2016/PHP2560/Project8/get_data.R")
+```
+3. Cleaning
+    a. Begin to clean the data. 
+    b. Add value labels for variables you wish to use. 
+    c. Make sure the data types in R are correct. 
+    d. Do not clean anything by hand but automate all of it. 
+    e. Write a file called `clean_data.R` that does these steps. 
+```{r}
+#source("/Users/PY/GoogleDrive/Fall2016/PHP2560/Project8/clean_data.R")
+```
+
+## November 9, 2016
+
+At this point use a small sample of your data to quickly work through all of these steps until we get to the end. 
+
+4. Graphics
+    a. Explore your data with graphs.
+    b. Produce quality graphics that allow you to begin to answer your questions.
+    c. Save these graphics. 
+    d. Write a file called `make_graphs.R` which does all of these steps. 
+
+5. Summary Tables
+    a. Create tables that summarize the important data. 
+    b. Write a file called `make_tables.R` that does this. 
+
+6. The analysis
+    a. Decide on steps for an analysis.
+    b. Run appropriate models.
+    c. If all you know is linear regression, that is fine just make sure you try and model the data. 
+    d. Output the exact information you want out of these models into tables. (See `knitr::kable`)
+    e. Create an R file called `make_analysis.R` that performs your analysis
+    
+    
+## November 16, 2016
+
+7. The Document
+    a. Create a markdown report which takes the data, graphs, summary tables and analysis tables.
+    b. This document should then display all of your results in a concise manner. 
+    
+8. The Make file
+    a. Create a make file.
+    b. Run your analysis on full data. 
+    
+    
+```{r}
+load("MOVIE.rda")
+library(dplyr)
+
+### regression analysis
+x <- dat %>%
+  select(aspect_ratio, cast_total_facebook_likes,facenumber_in_poster,
+         num_critic_for_reviews, duration, movie_facebook_likes, 
+         director_facebook_likes, num_voted_users, actor_1_facebook_likes, 
+         actor_2_facebook_likes, actor_3_facebook_likes, budget, gross, imdb_score)
+x <- na.omit(x)
+var_name <- c("aspect_ratio", "cast_total_facebook_likes", "facenumber_in_poster",
+              "num_critic_for_reviews", "duration", "movie_facebook_likes",
+              "director_facebook_likes", "num_voted_users", "actor_1_facebook_likes", 
+              "actor_2_facebook_likes", "actor_3_facebook_likes", "budget", "gross","imdb_score")
+pval <- rep(0, (length(var_name)-1))
+for (i in 1:(length(var_name)-1)){
+  pval[i] <- summary(lm(paste0("imdb_score~", var_name[i]), data = x))$coefficients[8]
+}
+
+sig_var <- var_name[which(pval < 0.001)]  # significant variable
+
+sum_lm <- list(0,0,0,0,0,0,0,0,0,0,0,0,0)
+for (i in 1:(length(var_name)-1)){
+  sum_lm[[i]] <- summary(lm(paste0("imdb_score~", var_name[i]), data = x))$coefficients
+}
+
+for (i in 1:length(sum_lm)){
+  print(knitr::kable(as.data.frame(sum_lm[[i]])))
+}
+```

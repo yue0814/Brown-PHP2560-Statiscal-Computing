@@ -1,0 +1,107 @@
+---
+title: "week9"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(stringr)
+library(rvest)
+library(RCurl)
+library(XML)
+scrapbudget <- function(x) {
+session <- html_session("https://www.google.com/")
+form <- html_form(session)[[1]]
+input <- paste(x,'',"movie budget")
+filled_form <- set_values(form, q = input)
+
+session1 <- submit_form(session,filled_form)
+
+info <- session1 %>%
+     html_nodes("div#center_col div") %>%
+     html_text()
+info <- unlist(strsplit(info[2],' '))[1]
+
+budget_pattern <- paste("[0-9]+")
+m <- regexpr(budget_pattern, info)
+budget <- as.numeric(regmatches(info, m))
+if (length(budget) != 0) {
+budget <- budget*1000000
+} else {budget = 0}
+  return(budget)
+}
+```
+
+```{r}
+scrapgross <- function(x) {
+session <- html_session("https://www.google.com/")
+form <- html_form(session)[[1]]
+input <- paste(x,'',"box office")
+filled_form <- set_values(form, q = input)
+
+session1 <- submit_form(session,filled_form)
+
+info <- session1 %>%
+     html_nodes("div#center_col div") %>%
+     html_text()
+info <- info[2]
+
+
+gross_pattern <- paste("[0-9]+\\.?[0-9]")
+m <- regexpr(gross_pattern, info)
+gross <- as.numeric(regmatches(info, m))
+if (length(gross) != 0) {
+gross <- gross*1000000
+} else {gross = 0}
+  return(gross)
+}  
+```
+
+```{r}
+scrapyear <- function(x) {
+session <- html_session("https://www.google.com/")
+form <- html_form(session)[[1]]
+input <- paste(x,'',"movie release date")
+filled_form <- set_values(form, q = input)
+
+session1 <- submit_form(session,filled_form)
+
+info <- session1 %>%
+    html_nodes("div#center_col div") %>%
+    html_text()
+info <- info[2]
+
+year <- as.numeric(unlist(strsplit(info,' '))[3])
+if (length(year) == 0) {
+  year= 0}
+  return(year)
+}  
+
+```
+
+
+
+```{r,eval=FALSE}
+movie_name <- moviewithmissingbudget[,12]
+movie_name <- lapply(movie_name, str_trim)
+budget_whole <- lapply(movie_name,scrapbudget)
+moviebudgetadded <- data.frame(unlist(movie_name),unlist(budget_whole))
+```
+
+```{r,eval=FALSE}
+movie_name <- moviewithmissinggross[,12]
+movie_name <- lapply(movie_name, str_trim)
+gross_whole <- lapply(movie_name,scrapgross)
+moviegrossadded <- data.frame(unlist(movie_name),unlist(gross_whole))
+```
+
+```{r,eval=FALSE}
+movie_name <- moviewithmissingyear[,12]
+movie_name <- lapply(movie_name, str_trim)
+year_whole <- lapply(movie_name,scrapyear)
+movieyearadded <- data.frame(unlist(movie_name),unlist(year_whole))
+```

@@ -1,0 +1,177 @@
+---
+title: "Project 6: part b"
+author: "YUE PENG"
+date: "April 14, 2016"
+output:
+  html_document
+---
+
+```{r setup, include = FALSE, cache = FALSE}
+knitr::opts_chunk$set(eval=FALSE)
+
+```
+
+<style type="text/css">
+.table {
+
+    width: 80%;
+    margin-left:10%; 
+    margin-right:10%;
+}
+</style>
+
+####[Lab 7 Markdown]()
+
+## Setup 
+
+For the setup of this, I have created a database called titanic. The goal will be to use this lab to work on the titanic dataset. The code below will let you connect to the database. 
+
+```{R}
+library(DBI)
+library(RMySQL)
+con <- dbConnect(MySQL(),
+                 user = 'trial',
+                 password = 'password',
+                 host = '127.0.0.1',
+                 dbname='titanic')
+
+dbGetInfo(con)
+dbListTables(con)
+```
+
+
+1. What tables are in this database?
+```{r}
+query <- "show tables;"
+dbGetQuery(con, query)
+```
+
+2. Load the titanic data:
+
+```{r}
+titanic <- read.table("/home/php2560/titanic.csv", header=TRUE, sep=",")
+```
+
+3. Create a table in MySQL from this data. Name it `titanic_yourlastname`:
+
+```{r}
+dbWriteTable(con, "titanic_peng", titanic)
+```
+
+4. Now what tables are in this database?
+```{r}
+query <- "show tables;"
+dbGetQuery(con, query)
+```
+
+## Basic usage of commands
+
+We will start to use a list of commands that would be commonly used in MySQL:
+
+These are:
+
+- show tables;
+- describe titanic_yourlastname;
+- select name, pclass, age, sex from titanic limit 10;
+ 
+
+
+We can run any of these commands as follow:
+
+```
+query <- "show tables;"
+dbGetQuery(con, query)
+```
+
+Try these commands and test this out. 
+
+
+## R and MySQL
+
+5. Run the following SQL command. Before doing so describe what this is asking
+```{r}
+query5 <- "select pclass, survived, avg(age) as avg_age from titanic_peng
+   group by pclass, survived;"
+dbGetQuery(con,query5)
+```
+
+
+6.  Run the following SQL command. Before doing so describe what this is asking
+```{r}
+query6 <- "select pclass, survived, avg(age) as avg_age from titanic_peng
+   where survived = 1
+   group by pclass, survived;"
+dbGetQuery(con, query6)
+```
+
+
+7. Run the following SQL command. Before doing so describe what this is asking
+```{r}
+query7 <- "select name, pclass, survived, age from titanic_peng 
+   where name regexp '^.sen.+';"
+dbGetQuery(con, query7)
+```
+
+8. Run the following SQL command. Before doing so describe what this is asking
+```{r}
+query8 <- "select name, pclass, survived, age from titanic_yourlastname 
+   where name regexp 'Jakob.*$';"
+dbGetQuery(con, query8)
+```
+
+9.  Run the following SQL commands. What is different about them? What do they return?
+```{r}
+query9a <- "select name, pclass, survived, age from titanic_peng 
+   where name regexp 'Ivar.*$';"
+dbGetQuery(con, query9a)
+```
+   
+```{r}
+query9b <- "select name, pclass, survived, age from titanic_peng 
+   where name regexp ',.*Ivar.*$';"
+dbGetQuery(con, query9b)
+```
+
+
+10. We can also plot data from this:
+```{r}
+myQuery <- "select pclass, avg(fare) as avg_fare from titanic_peng
+              group by pclass;"
+myData <- dbGetQuery(con, myQuery)
+library(ggplot2)
+ggplot(myData, aes(pclass, avg_fare)) + geom_bar(stat="identity")
+```
+
+
+
+## More challenging
+
+11. Create a data frame with:
+- `pclass`
+- `sex`
+- `age`
+- `fare`
+- `survived`
+- `parch`
+Only for people who did not survive. 
+```{r}
+query11 <- "select pclass, sex, age, fare, survived, parch from titanic_peng 
+   where survived != 1;"
+notsurvive <- dbGetQuery(con, query11)
+notsurvive
+```
+
+12. Create a graph of the average survival over the different classes. Make two distinct lines for male and female passengers. Create this plot using ggplot. 
+```{r}
+query12 <- "select pclass, sex, avg(survived) as ave_sur from titanic_peng 
+   group by pclass, sex;"
+data12 <- dbGetQuery(con, query12)
+data12 <- data12[2:7,]
+library(ggplot2)
+ggplot(data12,aes(pclass,ave_sur, color=sex, group=sex))+geom_point(size=3)+geom_line()
+
+```
+```{r}
+query <- "describe titanic;"
+dbGetQuery(con, query)
+```
